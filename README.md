@@ -1,13 +1,14 @@
 # ADCS Issuer
 
-
-
 ADCS Issuer is a [cert-manager's](https://github.com/jetstack/cert-manager) CertificateRequest controller that uses MS Active Directory Certificate Service to sign certificates 
 (see [this design document](https://github.com/jetstack/cert-manager/blob/master/design/20190708.certificate-request-crd.md) for details on CertificateRequest CRD). 
 
-ADCS provides HTTP GUI that can be normally used to request new certificates or see status of existing requests. This implementation is simply a HTTP client that interacts with the
-ADCS server sending appropriately prepared HTTP requests and interpretting the server's HTTP responses (the approach inspired by [this Python ADCS client](https://github.com/magnuswatn/certsrv)).
+ADCS provides HTTP GUI that can be normally used to request new certificates or see status of existing requests. 
+This implementation is simply a HTTP client that interacts with the ADCS server sending appropriately prepared HTTP requests and interpretting the server's HTTP responses
+(the approach inspired by [this Python ADCS client](https://github.com/magnuswatn/certsrv)).
+
 It supports NTLM authentication.
+
 
 ## Description
 
@@ -167,4 +168,12 @@ More then one directive can be used at a time. e.g. to simulate rejecting the ce
 * Webhook
 * Helm chart
 * ...
+
+
+## Why interacing with a GUI?
+
+Unfortunately, there are no web services available for ADCS management only a DCOM interface [MS-CSRA](https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-csra/40e74714-14bf-4f97-a264-35efbd63a813).
+
+(there are SOAP-based web services for certificate enrollment: [MS-XCEP](https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-xcep/08ec4475-32c2-457d-8c27-5a176660a210) 
+and [MS-WSTEP](https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-wstep/4766a85d-0d18-4fa1-a51f-e5cb98b752ea)). 
 
