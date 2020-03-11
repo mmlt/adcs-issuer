@@ -28,23 +28,30 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/chojnack/adcs-issuer/test/adcs-sim/certserv"
 )
 
 var (
-	caWorkDir = flag.Lookup("workdir").Value.(flag.Getter).Get().(string)
-	serverPem = caWorkDir + "/ca/server.pem"
-	serverKey = caWorkDir + "/ca/server.key"
-	serverCsr = caWorkDir + "/ca/server.csr"
+	//caWorkDir = flag.Lookup("workdir").Value.(flag.Getter).Get().(string)
+	//serverPem = caWorkDir + "/ca/server.pem"
+	//serverKey = caWorkDir + "/ca/server.key"
+	//serverCsr = caWorkDir + "/ca/server.csr"
+	serverPem, serverKey, serverCsr string
 )
 
 func main() {
-	port := flag.Int("port", 8080, "Port to listen on")
+	port := flag.Int("port", 8443, "Port to listen on")
 	dns := flag.String("dns", "", "Comma separated list of domains for the simulator server certificate")
 	ips := flag.String("ips", "", "Comma separated list of IPs for the simulator server certificate")
 	flag.Parse()
+
+	caWorkDir, _ := os.Getwd() //TODO refactor
+	serverPem = caWorkDir + "/ca/server.pem"
+	serverKey = caWorkDir + "/ca/server.key"
+	serverCsr = caWorkDir + "/ca/server.csr"
 
 	certserv, err := certserv.NewCertserv()
 	if err != nil {

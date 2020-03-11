@@ -11,14 +11,9 @@ else
 GOBIN=$(shell go env GOBIN)
 endif
 
-# Build ADCS simulator
+# Run ADCS simulator
 sim:
-	go build -o bin/adcs-sim test/adcs-sim/main.go
-
-sim-install: sim
-	cp bin/adcs-sim /usr/local/bin
-	mkdir -p /usr/local/adcs-sim
-	cp -R test/adcs-sim/ca test/adcs-sim/templates /usr/local/adcs-sim
+	cd test/adcs-sim && go run main.go -dns example.com && cd -
 
 all: manager
 

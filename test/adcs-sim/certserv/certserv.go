@@ -6,7 +6,6 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"math"
@@ -32,7 +31,8 @@ type Certserv struct {
 }
 
 var (
-	caWorkDir  = *flag.String("workdir", "/usr/local/adcs-sim", "ADCS simulator working directory")
+	//TODO refactor caWorkDir  = *flag.String("workdir", "/usr/local/adcs-sim", "ADCS simulator working directory")
+	caWorkDir, _ = os.Getwd()
 	caCertFile = caWorkDir + "/ca/root.pem"
 	caKeyFile  = caWorkDir + "/ca/root.key"
 	caDir      = caWorkDir + "/ca"

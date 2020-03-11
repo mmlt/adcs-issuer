@@ -134,7 +134,12 @@ store it in local docker repo (Docker must be installed).
 ## Testing considerations
 
 ### ADCS Simulator
-The test/adcs-sim directory contains a simple ADCS simulator that can be used for basic tests (run `make sim-install` to build it and install in /usr/local directory tree). The simulator can be started on the host and work ad ADCS server that will sign certificates using provided self-signed certificate and key (`root.pem` and `root.key` files). If needed the certificate can be replaced with any other available.
+The test/adcs-sim directory contains a simple ADCS simulator that can be used for basic tests
+(see `make sim`).
+ 
+The simulator can be started on the host and work ad ADCS server that will sign certificates using provided
+self-signed certificate and key (`root.pem` and `root.key` files). 
+If needed the certificate can be replaced with any other available.
 
 The simulator accepts directives to control its behavior. The directives are set as additional domain names in the certificate request:
 * **delay.<time>.sim**  where <time> is e.g. 10m, 15h etc - the certificate will be issued after the specified time
@@ -150,8 +155,12 @@ More then one directive can be used at a time. e.g. to simulate rejecting the ce
 
 ## Open issues
  
-* Cert-manger limits the identity of the requestor to Organization and CommonName. Full X509 Distinguished Name support is needed. See: [Full X509 Distinguished Name support](https://github.com/jetstack/cert-manager/issues/2288)
-* When request is rejected by ADCS because of invalid data then there's a problem to indicate in CertificateReuqest that it should not be re-tried. See: [Problem with automatic retry of failed requests](https://github.com/jetstack/cert-manager/issues/2289)
+* Cert-manger limits the identity of the requestor to Organization and CommonName. 
+  Full X509 Distinguished Name support is needed. 
+  See: [Full X509 Distinguished Name support](https://github.com/jetstack/cert-manager/issues/2288)
+* When request is rejected by ADCS because of invalid data then there's a problem to indicate in CertificateReuqest 
+  that it should not be re-tried. 
+  See: [Problem with automatic retry of failed requests](https://github.com/jetstack/cert-manager/issues/2289)
 
 ## ToDos
 
