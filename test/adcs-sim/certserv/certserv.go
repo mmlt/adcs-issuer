@@ -33,9 +33,9 @@ type Certserv struct {
 var (
 	//TODO refactor caWorkDir  = *flag.String("workdir", "/usr/local/adcs-sim", "ADCS simulator working directory")
 	caWorkDir, _ = os.Getwd()
-	caCertFile = caWorkDir + "/ca/root.pem"
-	caKeyFile  = caWorkDir + "/ca/root.key"
-	caDir      = caWorkDir + "/ca"
+	caCertFile   = caWorkDir + "/ca/root.pem"
+	caKeyFile    = caWorkDir + "/ca/root.key"
+	caDir        = caWorkDir + "/ca"
 
 	tmplCertnewCer   = caWorkDir + "/templates/certnew.cer.tmpl"
 	tmplCertCaRc     = caWorkDir + "/templates/certcarc.asp.tmpl"

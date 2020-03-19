@@ -11,16 +11,16 @@ else
 GOBIN=$(shell go env GOBIN)
 endif
 
-# Run ADCS simulator
-sim:
-	cd test/adcs-sim && go run main.go -dns example.com && cd -
-
 all: manager
 
 # Run tests
 test: generate fmt vet manifests
-	go test ./... -coverprofile cover.out
+	go test ./controllers/... ./issuers/... -coverprofile cover.out
 
+# e2e tests (requires simulator, see sim target)
+teste2e: 
+	go test ./test/... -coverprofile cover.out
+	
 # Build manager binary
 manager: generate fmt vet
 	go build -o bin/manager main.go
@@ -30,11 +30,11 @@ run: generate fmt vet manifests
 	go run ./main.go
 
 # Install CRDs into a cluster
-install: manifests
+install:
 	kustomize build config/crd | kubectl apply -f -
 
 # Deploy controller in the configured Kubernetes cluster in ~/.kube/config
-deploy: manifests
+deploy:
 	cd config/manager && kustomize edit set image controller=${IMG}
 	kustomize build config/default | kubectl apply -f -
 
@@ -78,3 +78,8 @@ CONTROLLER_GEN=$(GOBIN)/controller-gen
 else
 CONTROLLER_GEN=$(shell which controller-gen)
 endif
+
+# Run ADCS simulator
+sim:
+	cd test/adcs-sim && go run main.go -dns example.com && cd -
+

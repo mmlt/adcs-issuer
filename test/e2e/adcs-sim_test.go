@@ -1,19 +1,5 @@
 package e2e
 
-import (
-	"bytes"
-	"crypto/rand"
-	"crypto/rsa"
-	"crypto/x509"
-	"crypto/x509/pkix"
-	"encoding/pem"
-	"fmt"
-	"github.com/chojnack/adcs-issuer/adcs"
-	"github.com/stretchr/testify/assert"
-	"net"
-	"testing"
-)
-
 func TestADCSSim(t *testing.T) {
 	//adcsSimCertPool := load server CA so the client trusts adcs-sim.
 	adcsSimCertPool := &x509.CertPool{}
@@ -46,7 +32,10 @@ func TestADCSSim(t *testing.T) {
 	adcsResponseStatus, desc, id, err := cs.RequestCertificate(pemBuffer.String(), adcsCertTemplate)
 	assert.NoError(t, err)
 
+
+	//TODO assert
 	fmt.Println("adcsResponseStatus", adcsResponseStatus)
 	fmt.Println("desc", desc)
 	fmt.Println("id", id)
 }
+

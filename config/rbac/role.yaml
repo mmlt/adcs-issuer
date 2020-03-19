@@ -9,12 +9,6 @@ rules:
 - apiGroups:
   - ""
   resources:
-  - events
-  verbs:
-  - patch
-- apiGroups:
-  - ""
-  resources:
   - secrets
   verbs:
   - get
@@ -25,61 +19,41 @@ rules:
   resources:
   - adcsissuers
   verbs:
-  - create
-  - delete
   - get
   - list
-  - patch
-  - update
   - watch
+  - create
+  - update
+  - patch
+  - delete
 - apiGroups:
   - adcs.certmanager.csf.nokia.com
   resources:
   - adcsissuers/status
   verbs:
   - get
-  - patch
   - update
+  - patch
 - apiGroups:
   - adcs.certmanager.csf.nokia.com
   resources:
   - adcsrequests
   verbs:
-  - create
-  - delete
   - get
   - list
-  - patch
-  - update
   - watch
+  - create
+  - update
+  - patch
+  - delete
 - apiGroups:
   - adcs.certmanager.csf.nokia.com
   resources:
   - adcsrequests/status
   verbs:
   - get
-  - patch
   - update
-- apiGroups:
-  - adcs.certmanager.csf.nokia.com
-  resources:
-  - clusteradcsissuers
-  verbs:
-  - create
-  - delete
-  - get
-  - list
   - patch
-  - update
-  - watch
-- apiGroups:
-  - adcs.certmanager.csf.nokia.com
-  resources:
-  - clusteradcsissuers/status
-  verbs:
-  - get
-  - patch
-  - update
 - apiGroups:
   - cert-manager.io
   resources:
@@ -87,14 +61,40 @@ rules:
   verbs:
   - get
   - list
-  - patch
-  - update
   - watch
+  - update
+  - patch
 - apiGroups:
   - cert-manager.io
   resources:
   - certificaterequests/status
   verbs:
   - get
-  - patch
   - update
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - patch
+- apiGroups:
+  - adcs.certmanager.csf.nokia.com
+  resources:
+  - clusteradcsissuers
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - adcs.certmanager.csf.nokia.com
+  resources:
+  - clusteradcsissuers/status
+  verbs:
+  - get
+  - update
+  - patch
