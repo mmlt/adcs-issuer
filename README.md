@@ -64,7 +64,7 @@ spec:
   retryInterval: 1h
   url: <adcs-certice-url>
 ```
-The secret used by the `ClusterAdcsIssuer` must be defined in the namespace where controller's pod is running.
+The secret used by the `ClusterAdcsIssuer` to authenticate (`credentialsRef`), must be defined in the namespace where the controller's pod is running, or in the namespace specified by the flag  `-clusterResourceNamespace` (default: `kube-system`).
 
 ### Requesting certificates
 
