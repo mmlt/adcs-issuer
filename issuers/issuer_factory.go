@@ -26,6 +26,7 @@ type IssuerFactory struct {
 	client.Client
 	Log                      logr.Logger
 	ClusterResourceNamespace string
+	AdcsTemplateName         string
 }
 
 func (f *IssuerFactory) GetIssuer(ctx context.Context, ref cmmeta.ObjectReference, namespace string) (*Issuer, error) {
@@ -84,6 +85,7 @@ func (f *IssuerFactory) getAdcsIssuer(ctx context.Context, key client.ObjectKey)
 		certServ,
 		retryInterval,
 		statusCheckInterval,
+		f.AdcsTemplateName,
 	}, nil
 }
 
@@ -132,6 +134,7 @@ func (f *IssuerFactory) getClusterAdcsIssuer(ctx context.Context, key client.Obj
 		certServ,
 		retryInterval,
 		statusCheckInterval,
+		f.AdcsTemplateName,
 	}, nil
 }
 

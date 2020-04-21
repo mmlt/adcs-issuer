@@ -20,7 +20,7 @@ test: generate fmt vet manifests
 # e2e tests (requires simulator, see sim target)
 teste2e: 
 	go test ./test/... -coverprofile cover.out
-	
+
 # Build manager binary
 manager: generate fmt vet
 	go build -o bin/manager main.go
@@ -28,6 +28,10 @@ manager: generate fmt vet
 # Run against the configured Kubernetes cluster in ~/.kube/config
 run: generate fmt vet manifests
 	go run ./main.go
+
+# Uninstall CRDs from a cluster
+uninstall: 
+	kustomize build config/crd | kubectl delete -f -
 
 # Install CRDs into a cluster
 install:
@@ -53,6 +57,10 @@ vet:
 # Generate code
 generate: controller-gen
 	$(CONTROLLER_GEN) object:headerFile=./hack/boilerplate.go.txt paths="./..."
+
+# Login to registry
+docker-login: 
+	docker login 
 
 # Build the docker image
 docker-build: test
