@@ -14,15 +14,12 @@ import (
 	api "github.com/chojnack/adcs-issuer/api/v1"
 )
 
-const (
-	adcsCertTemplate = "BasicSSLWebServer"
-)
-
 type Issuer struct {
 	client.Client
 	certServ            adcs.AdcsCertsrv
 	RetryInterval       time.Duration
 	StatusCheckInterval time.Duration
+	AdcsTemplateName    string
 }
 
 // Go to ADCS for a certificate. If current status is 'Pending' then
@@ -49,7 +46,7 @@ func (i *Issuer) Issue(ctx context.Context, ar *api.AdcsRequest) ([]byte, []byte
 		}
 	} else {
 		// New request
-		adcsResponseStatus, desc, id, err = i.certServ.RequestCertificate(string(ar.Spec.CSRPEM), adcsCertTemplate)
+		adcsResponseStatus, desc, id, err = i.certServ.RequestCertificate(string(ar.Spec.CSRPEM), i.AdcsTemplateName)
 	}
 	if err != nil {
 		// This is a local error
