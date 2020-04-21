@@ -31,7 +31,7 @@ jobs:
         fi
 
     - name: Build
-      run: go build -v .
+      run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -o manager main.go
 
     - name: Create release
       id: create_release
@@ -51,7 +51,7 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./bin/adcs-issuer-${{ steps.get_version.outputs.VERSION }}-linux-amd64
-        asset_name: adcs-issuer-${{ steps.get_version.outputs.VERSION }}-linux-amd64
+        asset_path: ./
+        asset_name: manager
         asset_content_type: application/octet-stream
 
