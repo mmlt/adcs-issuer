@@ -26,4 +26,4 @@ bin
 .vs
 .vscode
 
-config/samples/s*
+examples/*

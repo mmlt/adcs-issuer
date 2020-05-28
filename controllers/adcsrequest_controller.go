@@ -21,6 +21,7 @@ import (
 
 	"github.com/go-logr/logr"
 	core "k8s.io/api/core/v1"
+	"k8s.io/klog"
 
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -51,6 +52,7 @@ func (r *AdcsRequestReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 
 	// your logic here
 	log.Info("Processing request")
+	klog.Info("Requesting to the template: ", r.IssuerFactory.AdcsTemplateName)
 
 	// Fetch the AdcsRequest resource being reconciled
 	ar := new(api.AdcsRequest)
@@ -87,6 +89,15 @@ func (r *AdcsRequestReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 		return ctrl.Result{Requeue: true, RequeueAfter: issuer.StatusCheckInterval}, nil
 	case api.Ready:
 		cr.Status.Certificate = cert
+		klog.V(4).Infof("Status is ready, so here's the certificate :\n %v\n", cert)
+
+		s := string(cert)
+		fmt.Println(" whaazaaaa")
+		fmt.Println(s)
+		fmt.Println("after println(s)")
+
+		klog.V(4).Infof("Stringified certificate :\n %v\n", cert)
+
 		cr.Status.CA = caCert
 		r.CertificateRequestController.SetStatus(ctx, &cr, cmmeta.ConditionTrue, cmapi.CertificateRequestReasonIssued, "ADCS request successfull")
 	case api.Rejected:

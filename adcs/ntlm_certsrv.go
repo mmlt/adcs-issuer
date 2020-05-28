@@ -5,13 +5,14 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"github.com/Azure/go-ntlmssp"
 	"io/ioutil"
-	"k8s.io/klog"
 	"net/http"
 	neturl "net/url"
 	"regexp"
 	"strings"
+
+	"github.com/Azure/go-ntlmssp"
+	"k8s.io/klog"
 )
 
 type NtlmCertsrv struct {
