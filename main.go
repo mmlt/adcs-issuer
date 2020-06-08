@@ -57,7 +57,7 @@ func main() {
 	flag.StringVar(&adcsTemplateName, "adcsTemplateName", "BasicSSLWebServer", "Name of ADCS Template.")
 	// klog
 	klog.InitFlags(nil)
-	flag.Set("v", "7")
+	flag.Set("v", "4")
 	flag.Set("alsologtostderr", "true")
 	flag.Parse()
 	log := klogr.New()

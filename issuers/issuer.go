@@ -2,16 +2,19 @@ package issuers
 
 import (
 	"context"
+	"encoding/pem"
 	"fmt"
 	"time"
 
 	//cmapi "github.com/jetstack/cert-manager/pkg/apis/certmanager/v1alpha2"
 	//cmmeta "github.com/jetstack/cert-manager/pkg/apis/meta/v1"
 	//metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/klog"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/chojnack/adcs-issuer/adcs"
 	api "github.com/chojnack/adcs-issuer/api/v1"
+	"github.com/fullsailor/pkcs7"
 )
 
 type Issuer struct {
@@ -35,7 +38,7 @@ func (i *Issuer) Issue(ctx context.Context, ar *api.AdcsRequest) ([]byte, []byte
 		// Of all the statuses only Pending requires processing.
 		// All others are final
 		if ar.Status.State == api.Pending {
-			// Check the status of the reqeust on the ADCS
+			// Check the status of the request on the ADCS
 			if ar.Status.Id == "" {
 				return nil, nil, fmt.Errorf("ADCS ID not set.")
 			}
@@ -47,6 +50,7 @@ func (i *Issuer) Issue(ctx context.Context, ar *api.AdcsRequest) ([]byte, []byte
 	} else {
 		// New request
 		adcsResponseStatus, desc, id, err = i.certServ.RequestCertificate(string(ar.Spec.CSRPEM), i.AdcsTemplateName)
+		// klog.Info("hello from requestCertificate function!")
 	}
 	if err != nil {
 		// This is a local error
@@ -78,11 +82,32 @@ func (i *Issuer) Issue(ctx context.Context, ar *api.AdcsRequest) ([]byte, []byte
 		ar.Status.Reason = desc
 	}
 
-	ca, err := i.certServ.GetCaCertificateChain()
+	caPKCS7, err := i.certServ.GetCaCertificateChain()
 	if err != nil {
 		return nil, nil, err
 	}
 
-	return cert, []byte(ca), nil
+	ca, err := parseCaCert([]byte(caPKCS7))
+	if err != nil {
+		klog.Error("something went wrong with parsing CA-cert PKCS7 to PEM")
+		return nil, nil, err
+	}
 
+	klog.V(4).Infof("will return cert! inside issuer.go: %v", cert)
+	return cert, ca, nil
+
+}
+
+// implementation converting PKCS7 to PEM format
+func parseCaCert(caPKCS7 []byte) (caPem []byte, err error) {
+
+	block, _ := pem.Decode([]byte(caPKCS7))
+	p7, err := pkcs7.Parse(block.Bytes)
+
+	caPem = pem.EncodeToMemory(&pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: p7.Certificates[0].Raw,
+	})
+
+	return caPem, err
 }
