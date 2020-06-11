@@ -89,14 +89,12 @@ func (r *AdcsRequestReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 		return ctrl.Result{Requeue: true, RequeueAfter: issuer.StatusCheckInterval}, nil
 	case api.Ready:
 		cr.Status.Certificate = cert
-		klog.V(4).Infof("Status is ready, so here's the certificate :\n %v\n", cert)
+		klog.V(2).Infof("status is ready, cert:\n %v\n", cert)
 
-		s := string(cert)
-		fmt.Println(" whaazaaaa")
-		fmt.Println(s)
-		fmt.Println("after println(s)")
-
-		klog.V(4).Infof("Stringified certificate :\n %v\n", cert)
+		if klog.V(3) {
+			s := string(cert)
+			klog.Infof("here's the readable certificate: \n %s ", s)
+		}
 
 		cr.Status.CA = caCert
 		r.CertificateRequestController.SetStatus(ctx, &cr, cmmeta.ConditionTrue, cmapi.CertificateRequestReasonIssued, "ADCS request successfull")

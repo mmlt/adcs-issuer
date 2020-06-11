@@ -27,3 +27,5 @@ bin
 .vscode
 
 examples/*
+issuers/testdata/pkcs7.pem
+issuers/testdata/x509.pem

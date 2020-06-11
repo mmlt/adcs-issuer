@@ -2,7 +2,9 @@ package issuers
 
 import (
 	"context"
+	"crypto/x509"
 	"encoding/pem"
+	"errors"
 	"fmt"
 	"time"
 
@@ -40,7 +42,7 @@ func (i *Issuer) Issue(ctx context.Context, ar *api.AdcsRequest) ([]byte, []byte
 		if ar.Status.State == api.Pending {
 			// Check the status of the request on the ADCS
 			if ar.Status.Id == "" {
-				return nil, nil, fmt.Errorf("ADCS ID not set.")
+				return nil, nil, fmt.Errorf("adcs id not set")
 			}
 			adcsResponseStatus, desc, id, err = i.certServ.GetExistingCertificate(ar.Status.Id)
 		} else {
@@ -50,7 +52,7 @@ func (i *Issuer) Issue(ctx context.Context, ar *api.AdcsRequest) ([]byte, []byte
 	} else {
 		// New request
 		adcsResponseStatus, desc, id, err = i.certServ.RequestCertificate(string(ar.Spec.CSRPEM), i.AdcsTemplateName)
-		// klog.Info("hello from requestCertificate function!")
+		klog.Infof("new request: adcsResponseStatus: %v, \n desc: %v, id: %v \n", adcsResponseStatus, desc, id)
 	}
 	if err != nil {
 		// This is a local error
@@ -68,7 +70,7 @@ func (i *Issuer) Issue(ctx context.Context, ar *api.AdcsRequest) ([]byte, []byte
 		// Certificate obtained successfully
 		ar.Status.State = api.Ready
 		ar.Status.Id = id
-		ar.Status.Reason = ""
+		ar.Status.Reason = "certificate obtained successfully"
 		cert = []byte(desc)
 	case adcs.Rejected:
 		// Certificate request rejected by ADCS
@@ -82,32 +84,77 @@ func (i *Issuer) Issue(ctx context.Context, ar *api.AdcsRequest) ([]byte, []byte
 		ar.Status.Reason = desc
 	}
 
-	caPKCS7, err := i.certServ.GetCaCertificateChain()
+	// Get a certificateChain from the server.
+	certChain, err := i.certServ.GetCaCertificateChain()
 	if err != nil {
 		return nil, nil, err
 	}
 
-	ca, err := parseCaCert([]byte(caPKCS7))
+	// Parse and encode the certificateChain to a valid x509 certificate.
+	ca, err := parseCaCert([]byte(certChain))
 	if err != nil {
-		klog.Error("something went wrong with parsing CA-cert PKCS7 to PEM")
+		klog.Error("something went wrong parsing to x509")
 		return nil, nil, err
 	}
 
-	klog.V(4).Infof("will return cert! inside issuer.go: %v", cert)
+	if klog.V(4) {
+		s := string(cert)
+		klog.Info(s)
+	}
+
+	// klog.V(4).Infof("will return cert: %v", cert)
+
 	return cert, ca, nil
 
 }
 
-// implementation converting PKCS7 to PEM format
-func parseCaCert(caPKCS7 []byte) (caPem []byte, err error) {
+// x509Bytes is a slice of bytes
+// type x509Bytes []byte
 
-	block, _ := pem.Decode([]byte(caPKCS7))
-	p7, err := pkcs7.Parse(block.Bytes)
+// ParseCaCert accepts bytes representing a certificate and returns x509 certificate encoded pem
+func parseCaCert(cc []byte) ([]byte, error) {
 
-	caPem = pem.EncodeToMemory(&pem.Block{
+	// decode Pem from certificate into block
+	block, rest := pem.Decode([]byte(cc))
+	if block == nil {
+		if klog.V(3) {
+			s := string(rest)
+			klog.Infof("tried to decode pem:  %v", s)
+		}
+		return nil, errors.New("error decoding the pem block")
+	}
+
+	// parse the decoded pem block to x509 encoded block
+	b, err := tryParseX509(block)
+	if err != nil {
+		return nil, err
+	}
+
+	// encodes the x509 encoded block to a valid x509 certificate encoded pem.
+	pem := pem.EncodeToMemory(&pem.Block{
 		Type:  "CERTIFICATE",
-		Bytes: p7.Certificates[0].Raw,
+		Bytes: b,
 	})
 
-	return caPem, err
+	return pem, nil
+}
+
+// TryParseX509 accepts *pem.Block and returns this with a valid x509 encoded block.
+func tryParseX509(block *pem.Block) ([]byte, error) {
+	// if certificate is already x509 encoded, return the certificate, otherwise continue and parse.
+	_, err := x509.ParseCertificate(block.Bytes)
+	if err == nil {
+		return block.Bytes, nil
+	}
+
+	b, err := pkcs7.Parse(block.Bytes)
+	if err == nil {
+		if len(b.Certificates) == 0 {
+			return nil, fmt.Errorf("expected one or more certificates")
+		}
+		return b.Certificates[0].Raw, nil
+	}
+
+	err = fmt.Errorf("parsing PKCS7: %w", err)
+	return nil, err
 }
