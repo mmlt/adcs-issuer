@@ -52,7 +52,10 @@ func (i *Issuer) Issue(ctx context.Context, ar *api.AdcsRequest) ([]byte, []byte
 	} else {
 		// New request
 		adcsResponseStatus, desc, id, err = i.certServ.RequestCertificate(string(ar.Spec.CSRPEM), i.AdcsTemplateName)
-		klog.Infof("new request: adcsResponseStatus: %v, \n desc: %v, id: %v \n", adcsResponseStatus, desc, id)
+
+		if klog.V(5) {
+			klog.Infof("new adcsRequest: adcsResponseStatus: %v, \n desc: %v id: %v \n", adcsResponseStatus, desc, id)
+		}
 	}
 	if err != nil {
 		// This is a local error
@@ -99,7 +102,7 @@ func (i *Issuer) Issue(ctx context.Context, ar *api.AdcsRequest) ([]byte, []byte
 
 	if klog.V(4) {
 		s := string(cert)
-		klog.Info(s)
+		klog.Infof("parsed CaCert: \n %v", s)
 	}
 
 	// klog.V(4).Infof("will return cert: %v", cert)

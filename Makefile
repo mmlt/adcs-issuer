@@ -63,7 +63,7 @@ docker-login:
 	docker login 
 
 # Build the docker image
-docker-build: test
+docker-build: 
 	docker build . -t ${IMG}
 
 # Push the docker image

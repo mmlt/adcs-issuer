@@ -195,7 +195,6 @@ func (s *NtlmCertsrv) RequestCertificate(csr string, template string) (AdcsRespo
 		"SaveCert":            {"yes"},
 		"CertificateTemplate": {template},
 	}
-	klog.V(4).Infof("Sending template:\n %v\n", template)
 
 	req, err := http.NewRequest("POST", url, bytes.NewBufferString(params.Encode()))
 	if err != nil {

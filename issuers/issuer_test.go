@@ -8,6 +8,7 @@ import (
 )
 
 // TODO: provide proper PKCS7 certificates for testing.
+// TODO: create makefile to populate testdata (openssl)
 // 2 tests will fail!
 // testdata/pkcs7.pem and testdata/x509.pem aren't provided, for the tests to be able to run, please provide own certs of these format.
 

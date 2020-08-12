@@ -52,7 +52,9 @@ func (r *AdcsRequestReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 
 	// your logic here
 	log.Info("Processing request")
-	klog.Info("Requesting to the template: ", r.IssuerFactory.AdcsTemplateName)
+	if klog.V(3) {
+		klog.Infof("requesting to template: %v", r.IssuerFactory.AdcsTemplateName)
+	}
 
 	// Fetch the AdcsRequest resource being reconciled
 	ar := new(api.AdcsRequest)
@@ -89,11 +91,10 @@ func (r *AdcsRequestReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 		return ctrl.Result{Requeue: true, RequeueAfter: issuer.StatusCheckInterval}, nil
 	case api.Ready:
 		cr.Status.Certificate = cert
-		klog.V(2).Infof("status is ready, cert:\n %v\n", cert)
 
-		if klog.V(3) {
+		if klog.V(5) {
 			s := string(cert)
-			klog.Infof("here's the readable certificate: \n %s ", s)
+			klog.Infof("certificate obtained: \n %s ", s)
 		}
 
 		cr.Status.CA = caCert
