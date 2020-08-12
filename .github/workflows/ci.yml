@@ -57,3 +57,12 @@ jobs:
           asset_path: ./manager-${{ steps.get_version.outputs.VERSION }}-linux-amd64
           asset_name: manager-${{ steps.get_version.outputs.VERSION }}-linux-amd64
           asset_content_type: application/octet-stream
+
+      - name: Publish to Registry
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: siemp/adcs-controller
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          buildargs: VERSION
+          tags: "latest,${{ env.VERSION }}"
