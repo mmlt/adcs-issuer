@@ -4,8 +4,8 @@ go 1.13
 
 require (
 	github.com/Azure/go-ntlmssp v0.0.0-20180810175552-4a21cbd618b4
+	github.com/fullsailor/pkcs7 v0.0.0-20190404230743-d7302db945fa
 	github.com/go-logr/logr v0.1.0
-	github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db // indirect
 	github.com/jetstack/cert-manager v0.11.0
 	github.com/onsi/ginkgo v1.10.2
 	github.com/onsi/gomega v1.7.0

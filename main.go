@@ -26,8 +26,9 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
+	"k8s.io/klog"
+	"k8s.io/klog/klogr"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -47,13 +48,23 @@ func main() {
 	var metricsAddr string
 	var enableLeaderElection bool
 	var clusterResourceNamespace string
+	var adcsTemplateName string
+
 	flag.StringVar(&metricsAddr, "metrics-addr", ":8080", "The address the metric endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false,
 		"Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
 	flag.StringVar(&clusterResourceNamespace, "cluster-resource-namespace", "kube-system", "Namespace where cluster-level resources are stored.")
+	flag.StringVar(&adcsTemplateName, "adcsTemplateName", "BasicSSLWebServer", "Name of ADCS Template.")
+	// klog
+	klog.InitFlags(nil)
+	flag.Set("v", "2")
+	flag.Set("alsologtostderr", "true")
 	flag.Parse()
+	log := klogr.New()
+	ctrl.SetLogger(log)
+	// flag.Parse()
 
-	ctrl.SetLogger(zap.Logger(true))
+	// ctrl.SetLogger(zap.Logger(true))
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:             scheme,
@@ -83,6 +94,7 @@ func main() {
 			Client:                   mgr.GetClient(),
 			Log:                      ctrl.Log.WithName("factories").WithName("AdcsIssuer"),
 			ClusterResourceNamespace: clusterResourceNamespace,
+			AdcsTemplateName:         adcsTemplateName,
 		},
 		Recorder:                     mgr.GetEventRecorderFor("adcs-requests-controller"),
 		CertificateRequestController: certificateRequestReconciler,
